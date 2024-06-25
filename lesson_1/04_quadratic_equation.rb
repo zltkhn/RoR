@@ -13,8 +13,7 @@ if D > 0
   puts "Корень x1: #{(-b - Math.sqrt(D))/(2*a)}"
   puts "Корень x2: #{(-b - Math.sqrt(D))/(2*a)}"
 elsif D == 0
-    puts "Дискриминант: #{D}"
-    puts "Корень: #{(-b)/(2*a)}"
+  puts "Дискриминант: #{D}"
+  puts "Корень: #{(-b)/(2*a)}"
 
 end
-
