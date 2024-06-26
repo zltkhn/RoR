@@ -10,7 +10,7 @@ puts "Дискриминант: #{D}, корней нет." if D<0
 
 if D > 0
   puts "Дискриминант: #{D}"
-  puts "Корень x1: #{(-b - Math.sqrt(D))/(2*a)}"
+  puts "Корень x1: #{(-b + Math.sqrt(D))/(2*a)}"
   puts "Корень x2: #{(-b - Math.sqrt(D))/(2*a)}"
 elsif D == 0
   puts "Дискриминант: #{D}"
