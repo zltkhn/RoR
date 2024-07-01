@@ -1,26 +1,38 @@
 
 puts "Для завершения напишите «стоп» в поле «Товар»."
 item = nil
-items = []
-if_empty = "Поле не может быть пустым"
-
+items = Hash.new
+total = []
 loop do
     print "\nТовар: "
     item = gets.chomp.to_s
-    items << item
+    #items["Товар"] = item
 
   break if item == "стоп" 
-
+ 
     print "Количество: "
     quantity = gets.chomp.to_f
 
     print "Цена (руб.): "
-    price = gets.chomp.to_f  
-
+    price = gets.chomp.to_f 
+ 
+   items[item] = {:quantity => quantity, :price => price, :sum => quantity*price }
+   total << items[item][:sum]
 end
-puts "\Корзина:" 
 
 items.delete("стоп")
-puts items
-busket = Hash.new
-busket 
+
+if items != 0
+  puts "\nКорзина:" 
+else
+  puts "\nКорзина пуста"
+end
+
+items.each do |item, prices|
+    puts "#{item}: #{prices}"
+end
+
+final = 0
+total.each {|sum| final += sum }
+
+puts  "Всего товаров на сумму: #{final} руб."
