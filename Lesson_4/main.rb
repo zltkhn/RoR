@@ -41,8 +41,10 @@ class RailRoad
         puts " 8 - Delete wagons from train"
         puts " 9 - Move tain forward"
         puts "10 - Move tain back"
-        puts "11 - Show routs  list"
+        puts "11 - Show routs list"
         puts "12 - Show stations list"
+        puts "13 - Show trains list"
+        puts "14 - Show wagons list"
         puts "0 - Exit"
         puts
         print "Сhoose option: "
@@ -57,12 +59,14 @@ class RailRoad
             when 4 then add_station_to_route
             when 5 then delete_station_from_route
             when 6 then assign_route_to_train
-            when 7 then create_station
+            when 7 then add_wagons_to_train
             when 8 then create_station
             when 9 then create_station
             when 10 then create_station
             when 11 then show_routs_list
             when 12 then show_stations_list
+            when 13 then show_trains_list
+            when 14 then show_wagons_list
             when 0 then exit
         else
             puts "There is no such an action. Please choose one of the following: \n"
@@ -108,7 +112,7 @@ class RailRoad
 
     #3
     def create_route
-        print "Enter start station: "
+        print "Enter first station: "
         a_station = gets.chomp.to_s.capitalize 
         print "Enter final station: "
         b_station = gets.chomp.to_s.capitalize
@@ -128,20 +132,8 @@ class RailRoad
         if all_routes.empty?
             puts "There is no routes to choose."
         else
-            puts "Choose route:"
-            all_routes_numbered
-            puts
-            print "Choose the route: "
-            r = gets.chomp.to_i
-            puts
-            puts "Choose station:"
-            puts "0. Create new sation"
-            all_stations_numbered
-            print "Choose the station: "
-            s = gets.chomp.to_i
-            create_station if s == 0 
-            current_route = all_routes[r-1]
-            current_station = all_stations[s-1]
+            current_route = choose_route
+            current_station = create_choose_station
             current_route.add_station(current_station.name)
             puts "Updated route: #{current_route.stations_list}"
         end
@@ -152,21 +144,11 @@ class RailRoad
         if all_routes.empty?
             puts "There is no routes to choose."
         else
-            puts "Choose route:"
-            all_routes_numbered
-            puts
-            print "Choose the route: "
-            r = gets.chomp.to_i
-            current_route = all_routes[r-1]
+            current_route = choose_route
             if current_route.stations.count <= 2
                 puts "It can't be less then 2 stations in route. Nothing to delete"
             else
-                puts "Choose station:"
-                current_route.stations.each.with_index(1) {|station, i| puts "#{i}. #{station}"} 
-                print "Choose the station: "
-                s = gets.chomp.to_i
-                
-                current_station = all_stations[s-1]
+                current_station = choose_station
                 current_route.remove_station(current_station.name)
                 puts "Updated route: #{current_route.stations_list}"
             end
@@ -176,26 +158,30 @@ class RailRoad
     #6
     def assign_route_to_train
         if all_trains.empty?
-            puts "There is no trains."
+            puts "There is no trains. Create new."
         elsif
             all_routes.empty?
             puts "There is no routes to assign."
         else
-            puts "Choose train: "   
-            all_trains_list_numbered
-            t = gets.chomp.to_i
-            current_train = all_trains[t-1]
-            
-            puts "Choose route: "
-            all_routes_numbered
-            print "Choose the route: "
-            r = gets.chomp.to_i
-            current_route = all_routes[r-1]
+            current_train = choose_train
+            current_route = choose_route
             current_train.accept_route(current_route)
         end
     end
-
+    
     #7
+    def add_wagons_to_train
+        current_train = choose_train
+        puts "Quantity of wagons: "
+        wagons = gets.chomp.to_i
+        current_train.add_wagon(wagons)
+        type = current_train.type
+        if type == 1
+            all_wagons << CargoWagon.new(num)
+        elsif type == 2
+            all_wagons << PassengerWagon.new(num)
+    end
+
 
     #8
 
@@ -221,7 +207,27 @@ class RailRoad
         end
     end
 
-private
+    #13
+    def show_trains_list
+        if all_trains.empty?
+            puts "There is no any trains."
+        else
+            all_trains.each.with_index(1) {|train, i| puts "#{i}. #{train.show_info}"}
+        end
+    end
+
+
+    #14
+    def show_wagons_list
+        if all_wagons.empty?
+            puts "There is no any wagons."
+        else
+            all_wagons.each.with_index(1) {|w, i| puts "#{i}. #{w.type}"}
+        end
+
+    end
+
+    private
 
     def all_trains_list_numbered
         all_trains.each.with_index(1) {|train, i| puts "#{i}. Train №#{train.number}"}
@@ -229,8 +235,8 @@ private
     end
 
     def all_trains_list_numbered_with_type
-    all_trains.each.with_index(1) {|train, i| puts "#{i}. Train №#{train.number} — #{train.type}"}
-    puts
+        all_trains.each.with_index(1) {|train, i| puts "#{i}. Train №#{train.number} — #{train.type}"}
+        puts
     end
 
     def all_stations_numbered
@@ -240,74 +246,45 @@ private
 
     def all_routes_numbered
         all_routes.each.with_index(1) {|route, i| puts "#{i}. Route: #{route.stations}"}
-    puts
+        puts
+    end
+
+    def choose_route
+        puts "Choose route: "
+        all_routes_numbered
+        print "Choose the route: "
+        r = gets.chomp.to_i
+        all_routes[r-1]
+    end
+
+    def choose_station
+        puts "Choose station:"
+        all_stations_numbered
+        print "Choose the station: "
+        s = gets.chomp.to_i
+        all_stations[s-1]
+    end
+
+    def create_choose_station
+        puts "Create or choose station:"
+        puts "0. Create new sation"
+        all_stations_numbered
+        print "Choose the station: "
+        s = gets.chomp.to_i
+        create_station if s == 0 
+        all_stations[s-1]
+    end
+
+    def choose_train
+        puts "Choose train: "   
+        all_trains_list_numbered
+        t = gets.chomp.to_i
+        all_trains[t-1]
     end
 
 end
 
-
 railroad = RailRoad.new
 railroad.start
 
-=begin
-action = gets.chomp.downcase.to_s
-
-puts "-----"
-w1 = CargoWagon.new("cargo")
-train1 = Train.new("Н123", "cargo")
-train1.show_info
-train2 = Train.new("А076", "passenger")
-train2.show_info
-train3 = Train.new("А999", "cargo")
-train3.show_info
-train4 = Train.new("9837", "passenger")
-train4.show_info
-puts "-----"
-train1.speed_up(40)
-train1.stop
-train1.current_speed
-train2.add_wagon(w1)
-train1.speed_up (200)
-train1.speed_down (20)
-train1.current_speed
-train1.add_wagon("cargo")
-
-puts "-----"
-station1 = Station.new("Таватуй")
-station1.trains_on_station_count
-station1.arrive(train1)
-station1.arrive(train2)
-station1.arrive(train3)
-station1.arrive(train4)
-station1.depart(train1)
-station1.trains_on_station_count
-station1.trains_list
-puts "-----"
-route1 = Route.new("Cан-Донато", "Гать")
-route1.stations_list
-route1.add_station("Аять")
-route1.add_station("Таватуй")
-route1.add_station("Невьянск")
-route1.remove_station("Невьянск")
-route1.remove_station("Уфа")
-route1.stations_list
-puts "-----"
-station1.trains_by_types
-puts "-----"
-train1.accept_route(route1)
-train1.go_next_station
-train1.go_next_station
-train1.go_next_station
-train1.go_next_station
-train1.go_next_station
-train2.substract_wagon
-train1.location
-station1.trains_list
-
-puts "ВАГОНЫ"
-
-train1.add_wagon(w1)
-train1.show_info
-
-puts "=====FINAL====="
-=end
+end

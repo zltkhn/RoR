@@ -42,7 +42,7 @@ class Train
     def accept_route(route)
         @route = route
         @position = 0
-        puts "Train #{number} follows the route: #{route.stations}"
+        puts "Train №#{number} follows the route: #{route.stations}"
         #puts "Start: «#{current_station}»"
     end
 
