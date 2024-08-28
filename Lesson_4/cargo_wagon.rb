@@ -1,3 +1,7 @@
-class CargoWagon  
-    super if @wagon == "passenger"
+class CargoWagon < Wagons
+    def initialize
+        type = :type
+        super
+    end
+  
 end

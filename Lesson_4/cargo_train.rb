@@ -1,3 +1,7 @@
 class CargoTrain < Train
-    super if @wagon == "cargo"
+    def initialize(number)
+        @type = :cargo
+        super
+    end
+    
 end

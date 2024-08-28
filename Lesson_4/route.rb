@@ -12,8 +12,8 @@ class Route
     def remove_station(station)
         stations.delete(station) if stations.include?(station) 
     end
-
+   
     def stations_list
-       stations
+        stations #.each.with_index(1) {|station, i| puts "#{i}. #{station.name}"}
     end
 end

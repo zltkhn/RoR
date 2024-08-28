@@ -1,15 +1,18 @@
 class Train
-    attr_reader :type, :number, :wagons, :speed
-    
-    def initialize(number, type)
+    attr_reader :type, :number, :train_wagons, :speed
+
+    PASSENGER_TYPE = :passenger
+    CARGO_TYPE = :cargo
+
+    def initialize(number)
         @number = number
         @type = type
         @speed = 0
-        @wagons = []
+        @train_wagons = []
     end
 
     def show_info
-        puts "Train №#{number} — #{type}, wagons: #{wagons}"
+        puts "Train №#{number} — #{type}, wagons: #{train_wagons}"
     end
 
     def current_speed
@@ -29,18 +32,18 @@ class Train
     end
 
     def add_wagon(wagon)
-        @wagons << wagon
+        @train_wagons << wagon
     end
  
     def substract_wagon
-        @wagons.delete = wagon if @wagons.empty? && @speed.zero?
+        @train_wagons.delete = wagon if @train_wagons.empty? && @speed.zero?
     end
 
     def accept_route(route)
         @route = route
         @position = 0
         puts "Train #{number} follows the route: #{route.stations}"
-        puts "Start: «#{current_station}»"
+        #puts "Start: «#{current_station}»"
     end
 
     def current_station
@@ -56,7 +59,6 @@ class Train
     end
 
     def go_next_station
-        #@position += 1 until next_station
         @position += 1 if next_station
     end
 
