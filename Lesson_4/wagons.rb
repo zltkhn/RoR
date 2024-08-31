@@ -1,9 +1,6 @@
 class Wagons
     attr_reader :type
-    def initialize(type)
-    end
+    
+    PASSENGER_TYPE = :passenger
+    CARGO_TYPE = :cargo
 end
-
-
-
-

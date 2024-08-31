@@ -1,6 +1,6 @@
 class PassengerWagon < Wagons
     def initialize
-        @type = PASSENGER_TYPE
+        @type = :passenger
         super
     end
 end

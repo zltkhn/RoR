@@ -1,9 +1,6 @@
 class Train
     attr_reader :type, :number, :train_wagons, :speed
 
-    PASSENGER_TYPE = :passenger
-    CARGO_TYPE = :cargo
-
     def initialize(number)
         @number = number
         @type = type
@@ -12,7 +9,7 @@ class Train
     end
 
     def show_info
-        puts "Train №#{number} — #{type}, wagons: #{train_wagons}"
+        puts "Train №#{number} — #{type}, wagons: #{train_wagons.count}"
     end
 
     def current_speed
@@ -31,19 +28,23 @@ class Train
         @speed = 0
     end
 
-    def add_wagon(wagon)
-        @train_wagons << wagon
+    def add_wagon
+        if @type == :cargo
+            train_wagons << CargoWagon.new
+        elsif @type == :passenger
+            train_wagons << PassengerWagon.new
+        end
     end
  
-    def substract_wagon
-        @train_wagons.delete = wagon if @train_wagons.empty? && @speed.zero?
+    def delete_wagon
+        train_wagons.delete_at(-1) #if @train_wagons.empty? && @speed.zero?
     end
 
     def accept_route(route)
         @route = route
         @position = 0
-        puts "Train №#{number} follows the route: #{route.stations}"
-        #puts "Start: «#{current_station}»"
+        puts "Train №#{number} follows the route: #{route.stations.map(&:name)}"
+        puts "First station: «#{current_station.name}»."
     end
 
     def current_station
