@@ -62,10 +62,12 @@ class RailRoad
         else
             puts "There is no such an action. Please choose one of the following: "
             puts
-            #добавить проверку если значние текст
         end
     end
 
+    protected
+    #мы вызывем методы через меню, и они запрашиваются у методов других клас
+    
     # 1
     def create_station
         print "Enter station's name: "
@@ -99,7 +101,7 @@ class RailRoad
         else
             print "Please repeat and select type 1 or 2."
         end
-        all_trains_numbered_with_type
+        all_trains_numbered
     end
 
     #3
@@ -108,6 +110,7 @@ class RailRoad
         if all_stations.empty?
             print "Enter station's name: " 
             a_station = Station.new(gets.chomp.to_s.capitalize)
+            all_stations << a_station
         else
             puts "0. Create new sation"
             all_stations_numbered
@@ -116,16 +119,23 @@ class RailRoad
             if s == 0 
                 print "Enter station's name: " 
                 a_station = Station.new(gets.chomp.to_s.capitalize)
-            end
-            all_stations[s-1]
+                all_stations << a_station
+            else
+                a_station = all_stations[s-1]
+            end              
         end
-        all_stations << a_station
         puts
         puts "Final station."
-        b_station = create_choose_station
-        while a_station == b_station
-            puts "Stations shoud be different."
+        if all_stations.count == 1
+            print "Enter station's name: " 
+            b_station = Station.new(gets.chomp.to_s.capitalize)
+            all_stations << b_station
+        else
             b_station = create_choose_station
+            while a_station == b_station
+                puts "Stations shoud be different."
+                b_station = create_choose_station
+            end
         end
         
         all_routes << Route.new(a_station, b_station)
@@ -155,8 +165,8 @@ class RailRoad
                 puts "It can't be less then 2 stations in route. Nothing to delete"
             else
                 current_station = choose_station
-                current_route.remove_station(current_station.name)
-                puts "Updated route: #{current_route.stations_list}"
+                current_route.remove_station(current_station)
+                puts "Updated route: #{current_route.stations.map(&:name)}"
             end
         end
     end
@@ -206,26 +216,36 @@ class RailRoad
             else            
                 num.times {current_train.delete_wagon}
                 current_train.show_info
-                #all_wagons.map{|wagon| wagon.type == :passenger}
              end
         end
     end
 
     #9
     def move_train
-        current_train = choose_train
-        current_route = choose_route
-        if current_train != nil && current_route != nil
+        current_train = choose_train 
+        if current_train.route == nil
+            current_route = choose_route
             current_train.accept_route(current_route)
-            current_train.current_station.arrive(current_train)
-            puts "1 - move forvard"
-            puts "2 — move backward"
-            choice = gets.chomp.to_i
-            current_train.go_next_station if choice == 1
-            current_train.go_previous_station if choice == 2
+            current_train.current_station.arrive(current_train)      
         else
-            "Create train and route before."
+            current_route = current_train.show_current_station_and_route
         end
+            
+        puts "1 - move forvard"
+        puts "2 — move backward"
+        choice = gets.chomp.to_i
+                if choice == 1                
+                    current_train.current_station.depart(current_train)
+                    current_train.go_next_station  
+                    current_train.current_station.arrive(current_train) 
+                    puts "Current station «#{current_train.current_station.name}»"    
+                elsif choice == 2
+                    current_train.current_station.depart(current_train)
+                    current_train.go_previous_station
+                    current_train.current_station.depart(current_train)
+                    puts "Current station «#{current_train.current_station.name}»"    
+                end
+        puts "Create train and route before." if current_train.nil? && current_route.nil?
     end
 
     #10
@@ -251,18 +271,12 @@ class RailRoad
         if all_trains.empty?
             puts "There is no any trains."
         else
-            all_trains_numbered_with_type
+            all_trains_numbered
         end
     end
-
-    #Вспомогательные методы
+    
 
     def all_trains_numbered
-        all_trains.each.with_index(1) {|train, i| puts "#{i}. Train №#{train.number}"}
-        puts
-    end
-
-    def all_trains_numbered_with_type
         all_trains.each.with_index(1) {|train, i| puts "#{i}. Train №#{train.number} — #{train.type}, wagons: #{train.train_wagons.count}"}
         puts
     end
@@ -272,13 +286,17 @@ class RailRoad
         puts
     end
 
+    def route_stations_numbered
+        current_route.each.with_index(1) {|station, i| puts "#{i}. #{station.name}: #{station.trains.map(&:number)} - #{station.trains.map(&:type)}"} 
+        puts
+    end
+
     def all_routes_numbered
         all_routes.each.with_index(1) {|route, i| puts "#{i}. Route: #{route.stations.map(&:name)}"}
         puts
     end
     
     def all_wagons_by_type
-        #all_wagons.each.with_index(1) {|w, i| puts "#{i}. wagon: #{w}"}
         puts "Cargo wagons: #{all_wagons.select{|wagon| wagon.type == :cargo}.count}" 
         puts "Passenger wagons: #{all_wagons.select{|wagon| wagon.type == :passenger}.count}" 
     end
@@ -288,9 +306,8 @@ class RailRoad
             puts "There is no routes."
         else
             all_routes_numbered
-            print "Choose: "
-            r = gets.chomp.to_i
-            all_routes[r-1]            
+            print "Choose route: "
+            all_routes[gets.chomp.to_i-1]            
         end
     end
 
@@ -298,12 +315,16 @@ class RailRoad
         if all_stations.empty?
             puts "There is no station in list."
         else
-            puts "Choose station:"
             all_stations_numbered
-            print "Choose: "
-            s = gets.chomp.to_i
-            all_stations[s-1]
+            print "Choose station: "
+            all_stations[gets.chomp.to_i-1]
         end
+    end
+
+    def choose_station_from_current_route
+        route_stations_numbered
+        print "Choose station: "
+        current.route[gets.chomp.to_i-1]
     end
 
     def create_choose_station
@@ -311,8 +332,7 @@ class RailRoad
             puts "There is no station in list."
             create_station
         else
-            puts "Create or choose station:"
-            puts
+            #puts "Create or choose station:"
             puts "0. Create new sation"
             all_stations_numbered
             print "Choose: "
@@ -326,13 +346,12 @@ class RailRoad
         if all_trains.empty?
             puts "There is no trains"
         else
-            print "Choose train: "   
             all_trains_numbered
+            print "Choose train: " 
             t = gets.chomp.to_i
             all_trains[t-1]
         end
     end
-
 end
 
 railroad = RailRoad.new

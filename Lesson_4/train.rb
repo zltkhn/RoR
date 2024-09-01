@@ -1,5 +1,5 @@
 class Train
-    attr_reader :type, :number, :train_wagons, :speed
+    attr_reader :type, :number, :train_wagons, :speed, :route
 
     def initialize(number)
         @number = number
@@ -44,7 +44,7 @@ class Train
         @route = route
         @position = 0
         puts "Train №#{number} follows the route: #{route.stations.map(&:name)}"
-        puts "First station: «#{current_station.name}»."
+        puts "Current station: «#{current_station.name}»."
     end
 
     def current_station
@@ -60,16 +60,25 @@ class Train
     end
 
     def go_next_station
+        #if next_station.last
         @position += 1 if next_station
     end
 
     def go_previous_station
-        @position -= 1 if previous_station
+        if previous_station <=1
+        @position -= 1 if previous_station 
+        else
+            puts "The train at first station"
+        end
     end
 
     def location
         puts "Current station «#{current_station}»."
         puts "Previous station «#{previous_station}»."
         puts "Next station «#{next_station}»."
+    end
+
+    def show_current_station_and_route
+        puts "Current station «#{current_station.name}» at the Route #{route.stations.map(&:name)}"
     end
 end
