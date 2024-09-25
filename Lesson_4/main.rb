@@ -21,7 +21,7 @@ class RailRoad
             menu
             action = gets.chomp.to_i
             puts
-            choose(action)
+            select(action)
         end
     end
 
@@ -44,7 +44,7 @@ class RailRoad
         print "Сhoose an option: "
     end
         
-    def choose(action)
+    def select(action)
         case action
             when 1 then create_station
             when 2 then create_train
@@ -70,16 +70,18 @@ class RailRoad
     
     # 1
     def create_station
+        if check_stations_by_name
         print "Enter station's name: "
         name = gets.chomp.to_s.capitalize
-         if all_stations.map(&:name).include?(name)
-            puts "This station already exist."
-         elsif
+        elsif
             all_stations << Station.new(name)
             puts "Station #{name} was created."
             puts
-         end
+        end
     end
+
+
+
 
     #2
     def create_train
@@ -106,6 +108,9 @@ class RailRoad
 
     #3
     def create_route
+        start_station = select_station
+        end_station = select_station
+
         puts "First station."
         if all_stations.empty?
             print "Enter station's name: " 
@@ -151,7 +156,6 @@ class RailRoad
             current_station = create_choose_station
             current_route.add_station(current_station)
             puts "Updated route: #{current_route.stations.map(&:name)}"
-        
         end
     end
 
@@ -164,7 +168,7 @@ class RailRoad
             if current_route.stations.count <= 2
                 puts "It can't be less then 2 stations in route. Nothing to delete"
             else
-                current_station = choose_station
+                current_station = select_station
                 current_route.remove_station(current_station)
                 puts "Updated route: #{current_route.stations.map(&:name)}"
             end
@@ -190,7 +194,7 @@ class RailRoad
     def add_wagons_to_train
         current_train = choose_train
         if current_train == nil
-             puts "Create train at first."
+            puts "Create train at first."
         else
             puts "Quantity of wagons: "
             num = gets.chomp.to_i
@@ -203,7 +207,7 @@ class RailRoad
     def delete_wagons_from_train
         current_train = choose_train
         if current_train == nil
-             puts "Create train at first."
+            puts "Create train at first."
         else
             current_train.show_info
             puts "Quantity of wagons to delete: "
@@ -311,14 +315,24 @@ class RailRoad
         end
     end
 
-    def choose_station
-        if all_stations.empty?
-            puts "There is no station in list."
-        else
-            all_stations_numbered
-            print "Choose station: "
-            all_stations[gets.chomp.to_i-1]
+    def select_station
+        if stations_empty
+        else select_station_from_list
         end
+    end
+    
+    def stations_empty 
+        puts "There is no station in list." if all_stations.empty?
+    end
+
+    def select_station_from_list
+        all_stations_numbered
+        print "Select station: "
+        all_stations[gets.chomp.to_i-1]
+    end
+
+    def check_stations_by_name
+        puts "This station already exist." if all_stations.map(&:name).include?(name)
     end
 
     def choose_station_from_current_route
@@ -328,8 +342,7 @@ class RailRoad
     end
 
     def create_choose_station
-        if all_stations.empty?
-            puts "There is no station in list."
+        if stations_empty 
             create_station
         else
             #puts "Create or choose station:"
@@ -345,6 +358,13 @@ class RailRoad
     def choose_train
         if all_trains.empty?
             puts "There is no trains"
+            print "Create train? Y / N: "
+            t = gets.chomp.to_s.capitalize
+            if t == Y 
+                create_train
+            else 
+                #закончить действие метода
+            end
         else
             all_trains_numbered
             print "Choose train: " 
@@ -352,9 +372,7 @@ class RailRoad
             all_trains[t-1]
         end
     end
-end
+    end
 
 railroad = RailRoad.new
 railroad.start
-
-
