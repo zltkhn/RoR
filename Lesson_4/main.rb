@@ -66,80 +66,53 @@ class RailRoad
     end
 
     protected
-    #мы вызывем методы через меню, и они запрашиваются у методов других клас
+    #мы вызывем все методы ниже через меню, и они запрашиваются у методов других классов
+    #поэтому можем их положить в протектед    
     
     # 1
     def create_station
-        print "Enter station's name: "
-        name = gets.chomp.to_s.capitalize
-         if all_stations.map(&:name).include?(name)
+        name = enter_station_name
+        if all_stations.map(&:name).include?(name)
             puts "This station already exist."
-         elsif
+            name = enter_station_name
+        elsif
             all_stations << Station.new(name)
-            puts "Station #{name} was created."
-            puts
-         end
+            puts "Station /#{name}/ was created."
+        end
     end
 
     #2
     def create_train
-        print "Enter train number: "
-        num = gets.chomp.to_s
+        num = enter_train_number
         while all_trains.map(&:number).include?(num)
             puts "This train already exist."
-            print "Enter train number: "
-            num = gets.chomp.to_s
+            num = enter_train_number
         end
-        print "Choose type (cargo - 1, passenger - 2): "
-        type = gets.chomp.to_i
+        type = select_train_type
         if type == 1
             all_trains << CargoTrain.new(num)
             puts "Train №#{num} created."
         elsif type == 2
             all_trains << PassengerTrain.new(num)
-            puts "Train №#{num} created."
+            puts "Train /№#{num}/ created."
         else
-            print "Please repeat and select type 1 or 2."
+            puts "Choose 1 or 2."
+            type = select_train_type
         end
         all_trains_numbered
     end
 
     #3
     def create_route
-        puts "First station."
-        if all_stations.empty?
-            print "Enter station's name: " 
-            a_station = Station.new(gets.chomp.to_s.capitalize)
-            all_stations << a_station
-        else
-            puts "0. Create new sation"
-            all_stations_numbered
-            print "Choose: "
-            s = gets.chomp.to_i
-            if s == 0 
-                print "Enter station's name: " 
-                a_station = Station.new(gets.chomp.to_s.capitalize)
-                all_stations << a_station
-            else
-                a_station = all_stations[s-1]
-            end              
+        a_station = create_first_station
+        b_station = create_final_station
+        while a_station == b_station
+            puts "Stations should be different."
+            b_station = create_final_station
         end
-        puts
-        puts "Final station."
-        if all_stations.count == 1
-            print "Enter station's name: " 
-            b_station = Station.new(gets.chomp.to_s.capitalize)
-            all_stations << b_station
-        else
-            b_station = create_choose_station
-            while a_station == b_station
-                puts "Stations shoud be different."
-                b_station = create_choose_station
-            end
-        end
-        
         all_routes << Route.new(a_station, b_station)
-        all_routes_numbered    
+        puts
+        all_routes_numbered
     end
 
     #4
@@ -151,7 +124,6 @@ class RailRoad
             current_station = create_choose_station
             current_route.add_station(current_station)
             puts "Updated route: #{current_route.stations.map(&:name)}"
-        
         end
     end
 
@@ -229,8 +201,7 @@ class RailRoad
             current_train.current_station.arrive(current_train)      
         else
             current_route = current_train.show_current_station_and_route
-        end
-            
+        end 
         puts "1 - move forvard"
         puts "2 — move backward"
         choice = gets.chomp.to_i
@@ -253,7 +224,7 @@ class RailRoad
         if all_routes.empty?
             puts "There is no any routs."
         else
-            all_routes.each.with_index(1) {|route, i| puts "#{i}. #{route.stations.map(&:name)}"}
+            all_routes_numbered
         end
     end
 
@@ -274,8 +245,8 @@ class RailRoad
             all_trains_numbered
         end
     end
-    
 
+    # Дополнительные методы
     def all_trains_numbered
         all_trains.each.with_index(1) {|train, i| puts "#{i}. Train №#{train.number} — #{train.type}, wagons: #{train.train_wagons.count}"}
         puts
@@ -311,6 +282,26 @@ class RailRoad
         end
     end
 
+    def choose_station_from_current_route
+        route_stations_numbered
+        print "Choose station: "
+        current.route[gets.chomp.to_i-1]
+    end
+
+    def create_choose_station
+        if all_stations.empty?
+            puts "There is no stations."
+            create_station
+        else
+            puts "0. Create new sation"
+            all_stations_numbered
+            print "Choose: "
+            s = gets.chomp.to_i
+            create_station if s == 0 
+            all_stations[s-1]
+        end
+    end
+    
     def choose_station
         if all_stations.empty?
             puts "There is no station in list."
@@ -320,28 +311,7 @@ class RailRoad
             all_stations[gets.chomp.to_i-1]
         end
     end
-
-    def choose_station_from_current_route
-        route_stations_numbered
-        print "Choose station: "
-        current.route[gets.chomp.to_i-1]
-    end
-
-    def create_choose_station
-        if all_stations.empty?
-            puts "There is no station in list."
-            create_station
-        else
-            #puts "Create or choose station:"
-            puts "0. Create new sation"
-            all_stations_numbered
-            print "Choose: "
-            s = gets.chomp.to_i
-            create_station if s == 0 
-            all_stations[s-1]
-        end
-    end
-
+    
     def choose_train
         if all_trains.empty?
             puts "There is no trains"
@@ -352,7 +322,52 @@ class RailRoad
             all_trains[t-1]
         end
     end
-end
 
+    def add_station
+        print "Enter station's name: " 
+        station = Station.new(gets.chomp.to_s.capitalize)
+        all_stations << station
+        station
+    end
+
+    def create_first_station
+        puts
+        puts "First station."
+        if all_stations.count == 0
+            a_station = add_station
+        else
+            a_station = create_choose_station
+        end
+        puts "Station /#{a_station.name}/ selected."
+        a_station
+    end
+
+    def create_final_station
+        puts
+        puts "Final station."
+        if all_stations.count == 1
+            b_station = add_station
+        else
+            b_station = create_choose_station
+        end
+        puts "Station /#{b_station.name}/ selected."
+        b_station
+    end
+
+    def enter_station_name
+        print "Enter station's name: "
+        name = gets.chomp.to_s.capitalize
+    end
+
+    def enter_train_number
+        print "Enter train's number: "
+        name = gets.chomp.to_s.capitalize
+    end
+
+    def select_train_type
+        print "Choose type (cargo - 1, passenger - 2): "
+        type = gets.chomp.to_i
+    end
+end
 railroad = RailRoad.new
 railroad.start

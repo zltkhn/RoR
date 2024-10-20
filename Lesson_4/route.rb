@@ -14,6 +14,6 @@ class Route
     end
    
     def stations_list
-        stations.each.with_index(1) {|s, i| puts "#{i}. #{s.name}"}
+        stations.each.with_index(1) {|station, i| puts "#{i}. #{station.name}"}
     end
 end
