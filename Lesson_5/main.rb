@@ -250,26 +250,15 @@ end
   
   #15 Find train
   def find_train
-    print "Enter train's number: "
-    num = gets.chomp
-    Train.find(num)
-  end
-=begin
-    if all_trains.empty?
+     if all_trains.empty?
       puts "There is no any trains."
-    else
-        if all_trains.map(&:number).include?(num) 
-          puts "Founded train №#{num} and object is: #{current_train}"
-        else
-          puts "There is no trains by number: #{num}"
-          puts "Object is #{current_train}" 
-        end
-    end
+     else
+      print "Enter train's number: "
+      num = gets.chomp
+      Train.find(num)
      end
-=end    
- 
-
-
+  end
+  
   # Дополнительные методы
   def all_trains_numbered
     if all_trains.empty?
